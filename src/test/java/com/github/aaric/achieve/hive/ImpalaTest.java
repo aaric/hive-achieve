@@ -2,6 +2,7 @@ package com.github.aaric.achieve.hive;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -101,6 +102,39 @@ public class ImpalaTest {
     public void testImportToTable() throws Exception {
         String filePath = "/data/test_complex_data.txt"; //上传文件到hdfs
         String sql = "load data local inpath '" + filePath + "' into table test_hive.test_complex_data";
+        ps = conn.prepareStatement(sql);
+        ps.execute();
+    }
+
+    /**
+     * hbase> create 'hbase_data', 'base'
+     * hbase> put 'hbase_data', 'row1', 'base:data', '{"name": "zhangsan", "age": 10}'
+     * hbase> put 'hbase_data', 'row2', 'base:data', '{"name": "lisi", "age": 12}'
+     * hbase> put 'hbase_data', 'row3', 'base:data', '{"name": "wangwu", "age": 12}'
+     * hbase> put 'hbase_data', 'row4', 'base:data', '{"name": "zhaoliu", "age": 10}'
+     * hbase> put 'hbase_data', 'row5', 'base:data', '{"name": "tianqi", "age": 15}'
+     * <p>
+     * hive> DROP TABLE IF EXISTS hive_data;
+     * hive> CREATE EXTERNAL TABLE hive_data(
+     * key string,
+     * data string
+     * ) STORED BY 'org.apache.hadoop.hive.hbase.HBaseStorageHandler'
+     * WITH SERDEPROPERTIES (
+     * "hbase.columns.mapping"=":key,base:data"
+     * ) TBLPROPERTIES ("hbase.table.name" = "hbase_data");
+     *
+     * @throws Exception
+     */
+    @Test
+    @Ignore
+    public void testSyncHBaseData() throws Exception {
+        String sql = "CREATE EXTERNAL TABLE hive_data(" +
+                "  key string," +
+                "  data string" +
+                ") STORED BY 'org.apache.hadoop.hive.hbase.HBaseStorageHandler'" +
+                " WITH SERDEPROPERTIES (" +
+                "  \"hbase.columns.mapping\"=\":key,base:data\"" +
+                ") TBLPROPERTIES (\"hbase.table.name\" = \"hbase_data\")";
         ps = conn.prepareStatement(sql);
         ps.execute();
     }
