@@ -1,5 +1,5 @@
 group 'com.github.aaric'
-version '0.0.1-SNAPSHOT'
+version '0.1.0-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'maven'
@@ -17,6 +17,17 @@ dependencies {
 
     compile("org.springframework.boot:spring-boot-starter:1.5.+")
     compile("org.springframework.boot:spring-boot-starter-log4j2:1.5+")
+
+    /* 必须与环境的版本一致，否则会报“java - Required field 'client_protocol' is unset!” */
+    // Apache Hadoop      hadoop-2.6.0+cdh5.13.3+2700
+    // Apache Hbase-solr  hbase-solr-1.5+cdh5.13.3+75
+    // Apache Hive        hive-1.1.0+cdh5.13.3+1307
+    // Apache Impala      impala-2.10.0+cdh5.13.3+0
+    // Apache Oozie	      oozie-4.1.0+cdh5.13.3+481
+    // Apache Solr        solr-4.10.3+cdh5.13.3+525
+    // Apache Zookeeper	  zookeeper-3.4.5+cdh5.13.3+126
+    compile("org.apache.hadoop:hadoop-common:2.6.0")
+    compile("org.apache.hive:hive-jdbc:1.1.0")
 
     testCompile("junit:junit:4.12")
     testCompile("org.springframework.boot:spring-boot-starter-test:1.5.+")
