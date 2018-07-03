@@ -10,12 +10,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 /**
- * HiveTest
+ * ImpalaTest
  *
- * @author Aaric, created on 2018-07-02T11:18.
+ * @author Aaric, created on 2018-07-03T13:48.
  * @since 0.1.0-SNAPSHOT
  */
-public class HiveTest {
+public class ImpalaTest {
 
     private Connection conn;
     private PreparedStatement ps;
@@ -25,7 +25,7 @@ public class HiveTest {
     public void begin() throws Exception {
         Class.forName("org.apache.hive.jdbc.HiveDriver");
 
-        conn = DriverManager.getConnection("jdbc:hive2://10.0.11.34:10000/dw");
+        conn = DriverManager.getConnection("jdbc:hive2://10.0.11.35:21050/dw;auth=noSasl");
     }
 
     @After
@@ -40,14 +40,14 @@ public class HiveTest {
 
     @Test
     public void testCreateDatabase() throws Exception {
-        String sql = "create database test_hive";
+        String sql = "create database test_impala";
         ps = conn.prepareStatement(sql);
         ps.execute();
     }
 
     @Test
     public void testDropDatabase() throws Exception {
-        String sql = "drop database test_hive";
+        String sql = "drop database test_impala";
         ps = conn.prepareStatement(sql);
         ps.execute();
     }
@@ -64,14 +64,14 @@ public class HiveTest {
 
     @Test
     public void testCreateTable() throws Exception {
-        String sql = "create table test_hive.test_complex_data(aa array<int>, bb map<string, int>, cc struct<a:string, b:int, c:double>)";
+        String sql = "create table test_impala.test_complex_data(aa array<int>, bb map<string, int>, cc struct<a:string, b:int, c:double>)";
         ps = conn.prepareStatement(sql);
         ps.execute();
     }
 
     @Test
     public void testDropTable() throws Exception {
-        String sql = "drop table test_hive.test_complex_data";
+        String sql = "drop table test_impala.test_complex_data";
         ps = conn.prepareStatement(sql);
         ps.execute();
     }
@@ -84,6 +84,17 @@ public class HiveTest {
         while (rs.next()) {
             System.out.println(rs.getString(1));
         }
+        ps.close();
+        rs.close();
+    }
+
+    @Test
+    public void testSyncToHive() throws Exception {
+        // Impala的数据会主动同步给Hive
+        // Hive的数据需要执行“invalidate metadata [table_name]”才会同步给Impala
+        String sql = "invalidate metadata";
+        ps = conn.prepareStatement(sql);
+        ps.execute();
     }
 
     @Test
